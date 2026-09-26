@@ -6,8 +6,6 @@
     "enabled": true
   },
   "assets": {
-    "directory": ".",
-    "not_found_handling": "404",
-    "exclude": [".git", ".git/**", "wrangler.jsonc"]
+    "directory": "."
   }
 }
