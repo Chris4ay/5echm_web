@@ -218,6 +218,7 @@
       ensureStylesheet(doc, "webhelpContentEnhanceStyles", resolveAsset("assets/content-enhance.css"));
       ensureScript(doc, "webhelpContentEnhanceScript", resolveAsset("assets/content-enhance.js"));
       ensureScript(doc, "webhelpContrastScript", resolveAsset("assets/webhelp-contrast.js"));
+      ensureScript(doc, "webhelpTopicNavScript", resolveAsset("assets/webhelp-topic-nav.js"));
       doc.documentElement.classList.add("webhelp-topic-document");
     } else {
       ensureStylesheet(doc, "webhelpNavStyles", resolveAsset("assets/webhelp-nav.css"));
@@ -486,7 +487,10 @@
     try { doc = navFrame.contentDocument; } catch (error) { return; }
     if (!doc || !doc.documentElement) return;
     applyDocumentPreferences(doc, "nav");
-    if (currentView === "contents") syncNavigationSelection(doc);
+    if (currentView === "contents") {
+      syncNavigationSelection(doc);
+      sendTopicNavToContent();
+    }
     if (currentView === "search") {
       applyPendingSearch(doc);
       enhanceSearchKeyboard(doc);
@@ -568,6 +572,24 @@
     } catch (error) {
       return null;
     }
+  }
+
+  function sendTopicNavToContent() {
+    var api = currentContentsApi();
+    if (!api || !api.getFlatNavigation) return;
+    var nav;
+    try { nav = api.getFlatNavigation(); } catch (e) { return; }
+    if (!nav || (nav.prev === null && nav.next === null)) return;
+    try {
+      var resolveHRef = function (href) {
+        try { return new URL(href, window.location.href).href; } catch (e) { return href; }
+      };
+      contentFrame.contentWindow.postMessage({
+        type: "webhelp-topic-nav",
+        prev: nav.prev ? { title: nav.prev.title, url: resolveHRef(nav.prev.href) } : null,
+        next: nav.next ? { title: nav.next.title, url: resolveHRef(nav.next.href) } : null
+      }, "*");
+    } catch (e) {}
   }
 
   function bookHeight(count, maximum) {
@@ -871,6 +893,7 @@
     nextHistoryMode = "push";
     if (currentView === "contents") {
       try { syncNavigationSelection(navFrame.contentDocument); } catch (error) {}
+      sendTopicNavToContent();
     }
     if (currentView === "bookmark") {
       try {
@@ -1004,6 +1027,10 @@
     });
     window.addEventListener("message", function (event) {
       var data = event && event.data;
+      if (data && data.type === "webhelp-topic-nav-request") {
+        sendTopicNavToContent();
+        return;
+      }
       if (data && data.type === "webhelp-search-close") {
         closeDrawer();
         setView(viewFromStorage(), { persist: false });

@@ -969,3 +969,110 @@ body.webhelp-home {
     color: #174e88;
   }
 }
+
+/* === Topic Navigation (Prev/Next) === */
+
+#webhelpTopicNav {
+  display: flex;
+  gap: 16px;
+  margin: 32px 0 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--topic-border);
+}
+
+#webhelpTopicNav .webhelp-topic-nav-spacer {
+  flex: 1;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 0 0 auto;
+  max-width: 48%;
+  padding: 14px 20px;
+  text-decoration: none;
+  color: var(--topic-text);
+  background: var(--topic-surface);
+  border: 1px solid var(--topic-border);
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-link:hover {
+  background: var(--topic-surface-muted);
+  border-color: var(--topic-accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#webhelpTopicNav .webhelp-topic-nav-link:focus-visible {
+  outline: 2px solid var(--topic-accent);
+  outline-offset: 2px;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-direction {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--topic-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-title {
+  font-size: 1em;
+  font-weight: 500;
+  color: var(--topic-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-prev {
+  text-align: left;
+}
+
+#webhelpTopicNav .webhelp-topic-nav-next {
+  margin-left: auto;
+  text-align: right;
+  align-items: flex-end;
+}
+
+@media print {
+  #webhelpTopicNav {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  #webhelpTopicNav {
+    flex-direction: column;
+    gap: 8px;
+    margin: 20px 0 12px;
+    padding-top: 12px;
+  }
+
+  #webhelpTopicNav .webhelp-topic-nav-link {
+    max-width: 100%;
+    padding: 8px 12px;
+    gap: 2px;
+    border-radius: 6px;
+  }
+
+  #webhelpTopicNav .webhelp-topic-nav-direction {
+    font-size: 0.75em;
+  }
+
+  #webhelpTopicNav .webhelp-topic-nav-title {
+    font-size: 0.9em;
+  }
+
+  #webhelpTopicNav .webhelp-topic-nav-next {
+    margin-left: 0;
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  #webhelpTopicNav .webhelp-topic-nav-spacer {
+    display: none;
+  }
+}

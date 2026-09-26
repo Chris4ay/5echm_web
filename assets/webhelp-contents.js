@@ -322,6 +322,49 @@
     return true;
   }
 
+  function flattenTopics() {
+    var list = [];
+    Array.prototype.slice.call(document.querySelectorAll('a[target="content"]')).forEach(function (link) {
+      if (/^#/i.test(link.getAttribute("href") || "")) return;
+      var label = link.querySelector('[id^="l"]');
+      var text = label ? (label.textContent || "").replace(/\s+/g, " ").trim() : "";
+      if (!text || text.indexOf("分割线") !== -1) return;
+      list.push({
+        labelId: label ? parseInt(label.id.slice(1), 10) : -1,
+        title: text,
+        href: link.getAttribute("href") || ""
+      });
+    });
+    return list;
+  }
+
+  function getFlatNavigation() {
+    var list = flattenTopics();
+    var current = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].labelId === LastSelected) { current = i; break; }
+    }
+    if (current < 0) {
+      var currentPath = "";
+      try { currentPath = (parent.WebHelpShell && parent.WebHelpShell.getCurrentTopic().url) || ""; } catch (e) {}
+      if (currentPath) {
+        var normalized = currentPath.split("?")[0].split("#")[0].toLowerCase();
+        for (var j = 0; j < list.length; j++) {
+          if (list[j].href && list[j].href.toLowerCase().indexOf(normalized) !== -1) {
+            current = j; break;
+          }
+        }
+      }
+    }
+    if (current < 0) return { prev: null, next: null, index: -1, total: list.length };
+    return {
+      prev: current > 0 ? list[current - 1] : null,
+      next: current < list.length - 1 ? list[current + 1] : null,
+      index: current,
+      total: list.length
+    };
+  }
+
   function snapshotBranches() {
     var snapshot = {};
     document.querySelectorAll('div[id^="d"]').forEach(function (branch) {
@@ -447,7 +490,8 @@
   window.WebHelpContents = {
     activateNode: activateBookNode,
     focusBook: focusBook,
-    getBookOutline: getBookOutline
+    getBookOutline: getBookOutline,
+    getFlatNavigation: getFlatNavigation
   };
   Object.defineProperty(window, "LastSelected", {
     get: function () { return LastSelected; },
