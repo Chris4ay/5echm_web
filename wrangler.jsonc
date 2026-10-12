@@ -6,6 +6,8 @@
     "enabled": true
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
+    // Workers 单文件上限 25MiB,排除 .git(pack 文件 ~37MiB)等非站点文件
+    "exclude": [".git"]
   }
 }
